@@ -1,0 +1,2 @@
+# this breaks my git diff pager so im disabling it for now
+# *.lockb binary diff=lockb
