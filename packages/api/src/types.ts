@@ -3,6 +3,7 @@ import { z } from "zod";
 export const PostRating = z.enum([
   "general",
   "safe",
+  "sensitive",
   "questionable",
   "explicit",
 ]);
