@@ -110,7 +110,7 @@ export async function postsList(
 
   const posts = data.map((item, idx) => {
     const imageUrl = toImageUrl(item.id, item.image, item.directory);
-    const previewUrl = toImageUrl(item.id, item.image, item.directory);
+    const previewUrl = toThumbnailUrl(item.id, item.image, item.directory);
 
     return {
       id: item.id,
