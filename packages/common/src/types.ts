@@ -54,5 +54,7 @@ export type PostsGetResponse = z.infer<typeof PostsGetResponse>;
 export const ProxyParams = z.object({
   encodedUrl: z.string(),
   encodedIv: z.string(),
+});
+export const ProxyQuery = z.object({
   save: z.optional(z.string()),
 });

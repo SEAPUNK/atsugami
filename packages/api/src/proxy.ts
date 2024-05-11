@@ -10,7 +10,7 @@ const secret = Buffer.from(PROXY_SECRET, "hex");
 export function fileProxyUrl(url: string, save: boolean = false): string {
   const [encodedUrl, encodedIv] = encryptUrl(url);
   const params = new URLSearchParams();
-  let proxyUrl = `proxy/${encodedUrl}/${encodedIv}`;
+  let proxyUrl = `api/proxy/${encodedUrl}/${encodedIv}`;
   if (save) {
     params.set("save", "1");
   }

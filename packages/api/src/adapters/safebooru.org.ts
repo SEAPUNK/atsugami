@@ -7,7 +7,7 @@ import {
   PostsGetParams,
   Post,
   PostRating,
-} from "../types";
+} from "@atsugami/common/types";
 import { fileProxyUrl } from "../proxy";
 
 const LIST_LIMIT_MAX = 100;

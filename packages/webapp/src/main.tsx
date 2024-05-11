@@ -4,9 +4,12 @@ import { Provider } from "react-redux";
 import App from "./App.tsx";
 import store from "./store";
 import { ThemeProvider } from "./theme-provider";
+import { initApp } from "@/features/app/app";
 import "@fontsource/geist-sans";
 import "@fontsource/geist-mono";
 import "./index.css";
+
+initApp();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
