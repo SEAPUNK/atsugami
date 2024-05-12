@@ -40,7 +40,7 @@ await $`git ls-files | tar Tzcfv - ${archivePath}`;
 
 // HACK: i need to use groundcontrol, but apparently it's
 // no longer published on github... so i need to build it locally
-let groundControlTag;
+// https://github.com/malyn/groundcontrol/issues/1
 {
   console.warn(chalk.magenta("Building groundcontrol image..."));
   let { exitCode } =
