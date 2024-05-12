@@ -49,10 +49,11 @@ jobs:
         env:
           IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
           IMAGE_LABELS: ${{ steps.meta.outputs.tags }}
-        run:
-          - echo $IMAGE_TAGS
-          - echo $IMAGE_LABELS
-          - cd ./packages/deploy/ && bun run build-docker-image
+        working-directory: ./packages/deploy/
+        run: |
+          echo $IMAGE_TAGS
+          echo $IMAGE_LABELS
+          bun run build-docker-image
 
       # - name: Build and push Docker image
       #   id: push
