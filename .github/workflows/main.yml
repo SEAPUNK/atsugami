@@ -41,7 +41,6 @@ jobs:
         with:
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=ref,tag
             type=sha
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
