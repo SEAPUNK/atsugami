@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --preload ./config.dev.js --watch src/index.ts",
-    "start": "NODE_ENV=production bun .",
+    "build": "NODE_ENV=production bun build ./src/index.ts --compile --minify --sourcemap --outfile dist/atsugami-api",
     "lint": "eslint",
     "format": "prettier -w ."
   },

@@ -1,2 +1,4 @@
 src/adapters/*
 !src/adapters/safebooru.org.ts
+dist/
+.env

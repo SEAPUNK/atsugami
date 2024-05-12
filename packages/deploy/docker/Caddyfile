@@ -1,0 +1,18 @@
+{
+	admin off
+}
+
+:55600
+log
+encode zstd gzip
+
+handle_path /api/* {
+	uri strip_prefix /api
+	reverse_proxy 127.0.0.1:55601
+}
+
+handle {
+	root * ./webapp/
+	try_files {path} /index.html
+	file_server
+}

@@ -1,0 +1,7 @@
+[[processes]]
+name = "atsugami-api"
+run = "/app/atsugami-api"
+
+[[processes]]
+name = "caddy"
+run = ["caddy", "run", "--config", "/app/Caddyfile", "--adapter", "caddyfile"]
