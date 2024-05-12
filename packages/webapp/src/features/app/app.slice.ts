@@ -89,6 +89,7 @@ const appSlice = createSlice({
       if (nextCursor < 0) nextCursor = state.browsePosts.length - 1;
       state.browseCursor = nextCursor;
     },
+    // TODO: rename: Image -> Post
     firstImage(state) {
       state.browseCursor = 0;
     },

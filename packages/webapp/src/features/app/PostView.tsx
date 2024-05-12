@@ -112,7 +112,7 @@ function PostViewer({ children }: { children: React.ReactNode }) {
       </div>
       <div
         className={cn(
-          "pointer-events-none transition-all absolute botitom-24 h-auto left-4 top-4 max-h-[calc(100% - 80px)]",
+          "pointer-events-none transition-all absolute bottom-24 h-auto left-4 top-4",
           showInfoPanel ? "translate-x-0" : "translate-x-[calc(-100%-16px)]",
         )}
       >
