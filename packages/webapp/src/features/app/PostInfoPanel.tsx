@@ -145,6 +145,7 @@ export default function PostInfoPanel({
           <Rating rating={selectedPost.rating} />
           <Dimensions width={selectedPost.width} height={selectedPost.height} />
           {/* TODO: file size? */}
+          {/* TODO: source */}
           <div className="my-2 w-full border-stone-200 border-t" />
         </div>
         <div className="px-3 gap-1 flex items-center">

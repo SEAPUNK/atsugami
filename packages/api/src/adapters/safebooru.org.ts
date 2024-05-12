@@ -91,8 +91,10 @@ export async function postsList(
   }
   urlParams.set("pid", String(pageNum));
 
-  if (listRequest.tags != null) {
-    urlParams.set("tags", listRequest.tags.join(" "));
+  let tagList = listRequest.tags;
+  if (tagList != null) {
+    if (tagList.length == 0) tagList = ["all"];
+    urlParams.set("tags", tagList.join(" "));
   }
 
   const url = endpoint(`index.php?${urlParams.toString()}`);
