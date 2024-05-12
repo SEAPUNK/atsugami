@@ -39,10 +39,20 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=ref,tag
+            type=sha
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # - name: Build Docker image
-      #   run:
+      - name: Build Docker image
+        env:
+          IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
+          IMAGE_LABELS: ${{ steps.meta.outputs.tags }}
+        run:
+          - echo $IMAGE_TAGS
+          - echo $IMAGE_LABELS
+          - cd ./packages/deploy/ && bun run build-docker-image
 
       # - name: Build and push Docker image
       #   id: push
