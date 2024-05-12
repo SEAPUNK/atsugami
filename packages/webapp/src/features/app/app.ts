@@ -18,7 +18,17 @@ import {
   setPageResults,
   stopLoading,
   toggleInfoPanel,
+  viewerRecenterToggleZoom,
+  viewerZoomIn,
+  viewerZoomOut,
 } from "./app.slice";
+import { ViewerControls } from "./ImageViewer";
+
+let viewerControlsRef: React.RefObject<ViewerControls | null> | null = null;
+
+export function setViewerControls(ref: React.RefObject<ViewerControls | null>) {
+  viewerControlsRef = ref;
+}
 
 function bindKeyboardShortcuts() {
   Mousetrap.bind("left", () => {
@@ -60,6 +70,18 @@ function bindKeyboardShortcuts() {
 
 export async function initApp() {
   bindKeyboardShortcuts();
+
+  startAppListening({
+    matcher: isAnyOf(viewerZoomIn, viewerZoomOut, viewerRecenterToggleZoom),
+    effect: (action) => {
+      let viewerControls = viewerControlsRef?.current;
+      if (viewerControls == null) return;
+      if (viewerZoomIn.match(action)) viewerControls.zoomIn();
+      else if (viewerZoomOut.match(action)) viewerControls.zoomOut();
+      else if (viewerRecenterToggleZoom.match(action))
+        viewerControls.recenterToggleZoom();
+    },
+  });
 
   startAppListening({
     matcher: isAnyOf(newSearch, loadNextPage),

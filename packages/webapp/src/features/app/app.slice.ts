@@ -24,6 +24,10 @@ export interface AppState {
 
   // self-explanatory
   showInfoPanel: boolean;
+
+  // READ ONLY: passed down image scale from the image viewer
+  // TODO: this is VERY ugly. can we do this better?
+  viewerScale: number;
 }
 
 const initialState: AppState = {
@@ -34,7 +38,8 @@ const initialState: AppState = {
   browsePosts: [],
   browseCursor: 0,
   searchLoading: false,
-  showInfoPanale: false,
+  showInfoPanel: false,
+  viewerScale: 0,
 };
 
 const appSlice = createSlice({
@@ -93,6 +98,12 @@ const appSlice = createSlice({
     toggleInfoPanel(state) {
       state.showInfoPanel = !state.showInfoPanel;
     },
+    viewerZoomIn() {},
+    viewerZoomOut() {},
+    viewerRecenterToggleZoom() {},
+    newViewerScale(state, action: PayloadAction<number>) {
+      state.viewerScale = action.payload;
+    },
   },
 });
 
@@ -114,5 +125,9 @@ export const {
   firstImage,
   lastImage,
   toggleInfoPanel,
+  viewerZoomIn,
+  viewerZoomOut,
+  viewerRecenterToggleZoom,
+  newViewerScale,
 } = appSlice.actions;
 export default appSlice.reducer;

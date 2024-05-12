@@ -28,7 +28,14 @@ import Mousetrap from "mousetrap";
 import { Input } from "@/ui/input";
 import { blurAllInputs, clamp } from "@/utils/atsugami";
 
-export default function BrowseControls() {
+export type BrowseControlsProps = {
+  onMouseOver?: (e: React.MouseEvent<HTMLElement>) => unknown;
+  onMouseOut?: (e: React.MouseEvent<HTMLElement>) => unknown;
+};
+export default function BrowseControls({
+  onMouseOver,
+  onMouseOut,
+}: BrowseControlsProps) {
   let dispatch = useAppDispatch();
   let browseCursor = useAppSelector((state) => state.app.browseCursor);
   let postsCount = useAppSelector((state) => state.app.browsePosts.length);
@@ -60,9 +67,13 @@ export default function BrowseControls() {
 
   return (
     <TooltipProvider>
-      <div className="bg-stone-100 p-2 shadow-md rounded-md pointer-events-auto flex items-center justify-center gap-4">
+      <div
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+        className="bg-stone-100 p-2 shadow-md rounded-md pointer-events-auto flex items-center justify-center gap-4"
+      >
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               variant="outline"
               size="sm"
@@ -74,14 +85,14 @@ export default function BrowseControls() {
           <TooltipContent>
             <p className="flex items-center justify-center gap-2">
               <kbd>i</kbd>
-              <span>Show info panel</span>
+              <span>Toggle info panel</span>
             </p>
           </TooltipContent>
         </Tooltip>
 
         <div className="flex gap-1">
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
@@ -98,7 +109,7 @@ export default function BrowseControls() {
             </TooltipContent>
           </Tooltip>
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
@@ -131,7 +142,7 @@ export default function BrowseControls() {
           </div>
 
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
@@ -148,7 +159,7 @@ export default function BrowseControls() {
             </TooltipContent>
           </Tooltip>
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
@@ -167,7 +178,7 @@ export default function BrowseControls() {
         </div>
 
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               variant="outline"
               size="sm"

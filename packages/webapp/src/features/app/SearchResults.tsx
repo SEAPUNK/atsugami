@@ -57,7 +57,7 @@ function PostPreview({ idx }: PostPreviewProps) {
     <img
       ref={previewRef}
       className={cn(
-        "object-contain object-center border-2 border-slate-200 bg-white",
+        "object-contain object-center border-2 border-slate-200 bg-white overflow-hidden",
         isSelected && "border-orange-400 bg-orange-400",
       )}
       onClick={handleClick}
@@ -122,7 +122,9 @@ export default function SearchResults() {
     >
       <div className="flex flex-row flex-wrap gap-4 items-center justify-center">
         {browsePosts.map((post, idx) => (
-          <PostPreview key={post.id} idx={idx} />
+          // keying NOT on post.id because apparently some boorus can reuse IDs
+          // for other posts?
+          <PostPreview key={post.unproxied_file_url} idx={idx} />
         ))}
         {browsePosts.length % 2 !== 0 && <div style={previewStyle} />}
       </div>

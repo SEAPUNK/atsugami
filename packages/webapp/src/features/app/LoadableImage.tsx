@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import ImageViewer from "./ImageViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
+import ControlledImageViewer from "./ControlledImageViewer";
 
 // TODO: rework this entire component using fetch to download the image
 // - fetch gives downoad progress (response.body is a ReadableStream)
@@ -14,9 +14,10 @@ import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 type LoadableImageProps = {
   src: string;
   preview: string;
+  sizeHint?: { width: number; height: number };
 };
 function LoadableImage(props: LoadableImageProps) {
-  const { src, preview } = props;
+  const { src, preview, sizeHint = { height: "100%", width: "100%" } } = props;
 
   let [loading, setLoading] = useState<boolean>(true);
   let [error, setError] = useState<boolean>(false);
@@ -54,7 +55,7 @@ function LoadableImage(props: LoadableImageProps) {
   return (
     <>
       {!loading && !error && imageElement != null && (
-        <ImageViewer
+        <ControlledImageViewer
           height={imageElement.naturalHeight}
           width={imageElement.naturalWidth}
           src={src}
@@ -62,7 +63,11 @@ function LoadableImage(props: LoadableImageProps) {
       )}
       {(loading || error) && (
         <div className="relative w-full h-full flex items-center justify-center">
-          <img className="object-contain w-full h-full" src={preview} />
+          <img
+            className="object-contain max-w-full max-h-full"
+            style={sizeHint}
+            src={preview}
+          />
           <div className="bg-black/20 flex absolute w-full h-full top-0 left-0 justify-center items-center">
             <div className="p-5 border border-black bg-white">
               {error ? (

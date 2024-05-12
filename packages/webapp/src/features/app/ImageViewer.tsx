@@ -1,7 +1,13 @@
-import { useMemo, useRef, useState, useEffect, useCallback } from "react";
-import { clamp } from "@/utils/atsugami";
-
-// TODO: go over this and clean it up a bit
+import {
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import { TimeoutId, clamp } from "@/utils/atsugami";
 
 // by what percent of the scaled pixels do we want to resize the image
 const SCALE_INTERVAL_PERCENT = 10 / 100;
@@ -220,13 +226,23 @@ function calculateImageCenterTranslate(
 // where the cursor is (or the image boundary point closest to where the cursor is)
 function calculateOriginZoomTranslate(
   viewportElement: HTMLElement,
-  mousePosition: Dimensions,
+  mousePosition: Dimensions | null,
   translateDims: Dimensions,
   oldScaledImageDims: Dimensions,
   newScaledImageDims: Dimensions,
 ) {
   // get mouse position within parent
   const parentRect = viewportElement.getBoundingClientRect();
+
+  if (mousePosition == null) {
+    // if mousePosition isn't provided, fake a position that would cause a zoom from center
+    const parentRect = viewportElement.getBoundingClientRect();
+    mousePosition = {
+      x: Math.round(parentRect.left) + parentRect.width / 2,
+      y: Math.round(parentRect.top) + parentRect.height / 2,
+    };
+  }
+
   const mouseRelativeX = mousePosition.x - Math.round(parentRect.left);
   const mouseRelativeY = mousePosition.y - Math.round(parentRect.top);
 
@@ -250,23 +266,29 @@ function calculateOriginZoomTranslate(
   };
 }
 
-type Dimensions = {
+export type Dimensions = {
   x: number;
   y: number;
 };
 
+export type ViewerControls = {
+  zoomIn: () => unknown;
+  zoomOut: () => unknown;
+  recenterToggleZoom: () => unknown;
+};
+
 type Props = {
-  // TODO: pass element instead of src
-  // element: HTMLElement;
   src: string;
 
   // we want to enforce the dimensions of the child
   // so our transforms don't randomly break
   height: number;
   width: number;
+
+  onScale?: (scale: number) => unknown;
 };
-function ImageViewer(props: Props) {
-  const { src, height, width } = props;
+function ImageViewer(props: Props, ref: React.Ref<ViewerControls>) {
+  const { src, height, width, onScale } = props;
   const imageDims = useMemo<Dimensions>(() => {
     return { x: width, y: height };
   }, [width, height]);
@@ -285,6 +307,11 @@ function ImageViewer(props: Props) {
   const scaledImageDims = useMemo<Dimensions>(() => {
     return calculateScaledImageDimensions(imageDims, imageScale);
   }, [imageDims, imageScale]);
+
+  // sending down new image scale
+  useEffect(() => {
+    onScale?.(imageScale);
+  }, [onScale, imageScale]);
 
   // element refs
   const [parentElement, setParentElement] = useState<HTMLElement>();
@@ -358,7 +385,7 @@ function ImageViewer(props: Props) {
 
   // zoom percent overlay ui
   const [showZoom, setShowZoom] = useState(false);
-  const showZoomTimer = useRef<any>(); // TODO: fix typing for setTimeout/clearTimeout
+  const showZoomTimer = useRef<TimeoutId>();
   function triggerShowZoom() {
     if (showZoomTimer.current) {
       clearTimeout(showZoomTimer.current);
@@ -392,19 +419,14 @@ function ImageViewer(props: Props) {
     });
   }
 
-  // scaling handler (image zoom)
-  function handleScroll(evt: React.WheelEvent) {
+  function zoomImage(zoomIn: boolean, mousePosition: Dimensions | null) {
     // don't do anything if the image isn't visible
     if (imageScale === 0) return;
     // don't do anything if our deps don't exist
     if (parentElement == null || parentDims == null) return;
 
-    const { deltaY, clientX, clientY } = evt;
-    if (deltaY === 0) return;
-    const mousePosition = { x: clientX, y: clientY };
-
     // scale image
-    const newScale = calculateScaleTo(imageDims, imageScale, deltaY < 0, []);
+    const newScale = calculateScaleTo(imageDims, imageScale, zoomIn, []);
     const newScaledImageDims = calculateScaledImageDimensions(
       imageDims,
       newScale,
@@ -430,25 +452,18 @@ function ImageViewer(props: Props) {
     triggerShowZoom();
   }
 
-  // double click handler (image reset, scaling toggles)
-  function handleMouseDown(evt: React.MouseEvent) {
-    // don't do anything if our deps dont have values
-    if (parentDims == null || parentElement == null) return;
-
-    // ignore everything but first click
-    if ((evt.buttons & PRIMARY_BUTTON) !== PRIMARY_BUTTON) return;
-    const { clientX, clientY } = evt;
+  // scaling handler (image zoom)
+  function handleScroll(evt: React.WheelEvent) {
+    const { deltaY, clientX, clientY } = evt;
+    if (deltaY === 0) return;
     const mousePosition = { x: clientX, y: clientY };
 
-    const now = Date.now();
-    if (now - firstClickTime.current > DOUBLE_CLICK_TIMEOUT) {
-      // didn't double click fast enough
-      firstClickTime.current = now;
-      return;
-    }
+    zoomImage(deltaY < 0, mousePosition);
+  }
 
-    // reset firstClickTime so the user has to double click again
-    firstClickTime.current = 0;
+  function recenterToggleZoom(mousePosition: Dimensions | null) {
+    // don't do anything if our deps dont have values
+    if (parentDims == null || parentElement == null) return;
 
     const fitScale = calculateImageFitScale(imageDims, parentDims);
     let nextImageScale: number;
@@ -505,7 +520,41 @@ function ImageViewer(props: Props) {
     triggerShowZoom();
   }
 
+  // double click handler (image reset, scaling toggles)
+  function handleMouseDown(evt: React.MouseEvent) {
+    // ignore everything but first click
+    if ((evt.buttons & PRIMARY_BUTTON) !== PRIMARY_BUTTON) return;
+    const { clientX, clientY } = evt;
+    const mousePosition = { x: clientX, y: clientY };
+
+    const now = Date.now();
+    if (now - firstClickTime.current > DOUBLE_CLICK_TIMEOUT) {
+      // didn't double click fast enough
+      firstClickTime.current = now;
+      return;
+    }
+
+    // reset firstClickTime so the user has to double click again
+    firstClickTime.current = 0;
+
+    recenterToggleZoom(mousePosition);
+  }
+
   const zoomPercent = Math.floor(imageScale * 100);
+
+  useImperativeHandle(ref, () => {
+    return {
+      zoomIn: () => {
+        zoomImage(true, null);
+      },
+      zoomOut: () => {
+        zoomImage(false, null);
+      },
+      recenterToggleZoom: () => {
+        recenterToggleZoom(null);
+      },
+    };
+  });
 
   return (
     <div
@@ -542,4 +591,6 @@ function ImageViewer(props: Props) {
   );
 }
 
-export default ImageViewer;
+const RefImageViewer = forwardRef(ImageViewer);
+
+export default RefImageViewer;
