@@ -48,13 +48,10 @@ jobs:
       - name: Build Docker image
         id: push
         env:
-          IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
-          IMAGE_LABELS: ${{ steps.meta.outputs.tags }}
+          CI_IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
+          CI_IMAGE_LABELS: ${{ steps.meta.outputs.tags }}
         working-directory: ./packages/deploy/
-        run: |
-          echo $IMAGE_TAGS
-          echo $IMAGE_LABELS
-          bun run build-docker-image
+        run: bun run build-docker-image
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
