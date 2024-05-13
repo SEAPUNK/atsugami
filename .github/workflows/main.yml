@@ -50,7 +50,7 @@ jobs:
         id: push
         env:
           CI_IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
-          CI_IMAGE_LABELS: ${{ steps.meta.outputs.tags }}
+          CI_IMAGE_LABELS: ${{ steps.meta.outputs.labels }}
         working-directory: ./packages/deploy/
         run: bun run build-docker-image
 
