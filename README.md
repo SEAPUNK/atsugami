@@ -1,4 +1,4 @@
-# atsugami
+# <img height="50" src="packages/webapp/public/atsugamiFavicon.png"> atsugami
 
 a booru viewer
 
