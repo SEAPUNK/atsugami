@@ -48,10 +48,43 @@ await $`git ls-files | tar Tzcfv - ${archivePath}`;
   exitCode && process.exit(exitCode);
 }
 
+function splitMultilineEnv(envvar: string) {
+  return envvar
+    .trim()
+    .split("\n")
+    .map((str) => str.trim());
+}
+
+// github CI: apply labels to images
+let imageLabelsArgs = { raw: "" };
+if (process.env.CI_IMAGE_LABELS) {
+  imageLabelsArgs = {
+    raw: splitMultilineEnv(process.env.CI_IMAGE_LABELS).reduce(
+      (arg, label) => `${arg} --label ${$.escape(label)}`,
+      "",
+    ),
+  };
+}
+
 // finally, get docker to build it
 {
   console.warn(chalk.magenta("Building docker image..."));
   let { exitCode } =
-    await $`docker build -t atsugami --build-arg GROUNDCONTROL_TAG=groundcontrol - < ${archivePath}`.nothrow();
+    await $`docker build -t atsugami ${imageLabelsArgs} --build-arg GROUNDCONTROL_TAG=groundcontrol - < ${archivePath}`.nothrow();
   exitCode && process.exit(exitCode);
+}
+
+// github CI: tag images, push them, and set image digest as the output
+if (process.env.CI_IMAGE_TAGS) {
+  let tags = splitMultilineEnv(process.env.CI_IMAGE_TAGS);
+  for (let tag of tags) {
+    console.warn(chalk.magenta(`Tagging and pushing ${chalk.cyan(tag)}`));
+    await $`docker tag atsugami ${tag}`;
+    await $`docker push ${tag}`;
+  }
+  console.warn(chalk.magenta(`Determining image digest...`));
+  let imageDigest = (
+    await $`docker inspect --format='{{.Id}}' atsugami`.text()
+  ).trim();
+  await $`echo ${`digest=${imageDigest}`} >> "$GITHUB_OUTPUT"`;
 }
