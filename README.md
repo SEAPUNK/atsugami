@@ -2,6 +2,9 @@
 
 a booru viewer
 
+https://github.com/SEAPUNK/atsugami/assets/4400726/33b3f1c8-23b2-4072-8b80-7955bfcbec16
+
+
 ## install
 
 (so far,) the easiest way to run it locally is to use docker:
