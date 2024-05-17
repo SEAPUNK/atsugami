@@ -2,7 +2,7 @@
 
 a booru viewer
 
-(a temporary demo site can be found here, hooked up to safebooru.org: https://ats.ivan.moe)
+(this project is still in its early staged! many improvements to come, see #1. a temporary demo site can be found here, hooked up to safebooru.org: https://ats.ivan.moe)
 
 https://github.com/SEAPUNK/atsugami/assets/4400726/33b3f1c8-23b2-4072-8b80-7955bfcbec16
 
